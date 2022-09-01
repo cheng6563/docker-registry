@@ -13,11 +13,16 @@ if [ -z "$registry" ]; then
 fi
 
 for line in "$registry"; do
-    arr=($line)
+    arr=(`echo ${line}`);
     src=`echo "${arr[0]}"`
     dst_name=`echo "${arr[1]}"`
+
+    if [ -z "$src" ] || [ -z "$dst_name"]; then
+        continue
+    fi
+
     dst="ghcr.io/$author/$dst_name"
-    echo "push registry $src and push to registry $dst"
+    echo "pull registry $src and push to registry $dst"
     docker pull $src
     docker tag $src $dst
     docker push $dst
