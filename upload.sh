@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 author=$1
 if [ -z "$author" ]; then
     echo 'use ./upload.sh ${{ github.actor }}'
