@@ -17,8 +17,11 @@ for line in "$registry"; do
     src=`echo "${arr[0]}"`
     dst_name=`echo "${arr[1]}"`
 
-    if [ -z "$src" ] || [ -z "$dst_name"]; then
+    if [ -z "$src" ]; then
         continue
+    fi
+    if [ -z "$dst_name" ]; then
+        dst_name="$src"
     fi
 
     dst="ghcr.io/$author/$dst_name"
