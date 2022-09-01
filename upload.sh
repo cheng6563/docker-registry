@@ -6,12 +6,18 @@ if [ -z "$author" ]; then
 fi
 
 registry=`cat registry.txt`
+
+if [-z "$registry" ]; then
+    echo "empty registry.txt"
+    exit 0
+fi
+
 for line in "$registry"; do
     arr=($line)
     src=`echo "${arr[0]}"`
     dst_name=`echo "${arr[1]}"`
     dst="ghcr.io/$author/$dst_name"
-    echo "Pull $src and push to $dst"
+    echo "push registry $src and push to registry $dst"
     docker pull $src
     docker tag $src $dst
     docker push $dst
