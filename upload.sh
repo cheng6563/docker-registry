@@ -7,7 +7,7 @@ fi
 
 registry=`cat registry.txt`
 
-if [-z "$registry" ]; then
+if [ -z "$registry" ]; then
     echo "empty registry.txt"
     exit 0
 fi
