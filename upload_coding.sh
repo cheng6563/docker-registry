@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 base_url="cheng6563-docker.pkg.coding.net/container-registry/public"
-# echo $CODING_PASSWORD | docker login --username=$CODING_USERNAME --password-stdin $base_url
+echo $CODING_PASSWORD | docker login --username=$CODING_USERNAME --password-stdin $base_url
 
 registry=`cat registry.txt`
 
@@ -9,12 +9,14 @@ if [ -z "$registry" ]; then
     exit 0
 fi
 
-for src in "$registry"; do
+echo "$registry" | while IFS= read -r src
+do
     if [ -z "$src" ]; then
         continue
     fi
     # coding not support using "/" splic, using "__" replace from "/".
-    dst="$base_url/${src//\//__}"
+    src2=$(echo "$src" | sed 's/\//__/g')
+    dst="$base_url/$src2"
     echo "pull registry '$src' and push to registry '$dst'"
     docker pull $src
     docker tag $src $dst

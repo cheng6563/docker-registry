@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 author=$1
 if [ -z "$author" ]; then
     echo 'use ./upload.sh ${{ github.actor }}'
@@ -12,7 +12,8 @@ if [ -z "$registry" ]; then
     exit 0
 fi
 
-for src in "$registry"; do
+echo "$registry" | while IFS= read -r src
+do
     if [ -z "$src" ]; then
         continue
     fi
