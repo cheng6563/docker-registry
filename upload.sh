@@ -17,7 +17,8 @@ do
     if [ -z "$src" ]; then
         continue
     fi
-    dst="ghcr.io/$author/$src"
+    newname=$(echo "$src" | sed 's/[^/]*\///')
+    dst="ghcr.io/$author/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
     docker pull $src
     docker tag $src $dst

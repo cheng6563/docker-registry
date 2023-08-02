@@ -14,9 +14,10 @@ do
     if [ -z "$src" ]; then
         continue
     fi
+    newname=$(echo "$src" | sed 's/[^/]*\///')
     # coding not support using "/" splic, using "__" replace from "/".
-    src2=$(echo "$src" | sed 's/\//__/g')
-    dst="$base_url/$src2"
+    newname=$(echo "$newname" | sed 's/\//__/g')
+    dst="$base_url/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
     docker pull $src
     docker tag $src $dst
