@@ -15,7 +15,7 @@ for src in "$registry"; do
     fi
     # coding not support using "/" splic, using "__" replace from "/".
     dst="$base_url/${src//\//__}"
-    echo "pull registry $src and push to registry $dst"
+    echo "pull registry '$src' and push to registry '$dst'"
     docker pull $src
     docker tag $src $dst
     docker push $dst

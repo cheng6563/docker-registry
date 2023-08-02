@@ -17,7 +17,7 @@ for src in "$registry"; do
         continue
     fi
     dst="ghcr.io/$author/$src"
-    echo "pull registry $src and push to registry $dst"
+    echo "pull registry '$src' and push to registry '$dst'"
     docker pull $src
     docker tag $src $dst
     docker push $dst
