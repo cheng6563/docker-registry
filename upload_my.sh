@@ -15,8 +15,6 @@ do
         continue
     fi
     newname=$(echo "$src" | sed 's/[^/]*\///')
-    # coding not support using "/" splic, using "__" replace from "/".
-    newname=$(echo "$newname" | sed 's/\//__/g')
     dst="$base_url/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
     docker pull $src

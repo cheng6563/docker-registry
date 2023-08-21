@@ -21,14 +21,17 @@ jobs:
     - name: build and push 
       run: ./upload.sh ${{ github.actor }}
   build_coding:
-    env:
-      CODING_USERNAME: ${{ secrets.CODING_USERNAME }}
-      CODING_PASSWORD: ${{ secrets.CODING_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
+    - name: login my registry
+      uses: docker/login-action@v1
+      with:
+        registry: cheng6563-docker.pkg.coding.net/container-registry/public
+        username: ${{ secrets.CODING_USERNAME }}
+        password: ${{ secrets.CODING_USERNAME }}
     - uses: actions/checkout@v3
     - name: build and push 
-      run: ./upload_coding.sh ${{ github.actor }}
+      run: ./upload_coding.sh 
   build_my:
     env:
       MY_REGISTRY_URL: ${{ secrets.MY_REGISTRY_URL }}

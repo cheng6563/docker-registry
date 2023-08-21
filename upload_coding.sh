@@ -1,6 +1,6 @@
 #!/bin/sh
 base_url="cheng6563-docker.pkg.coding.net/container-registry/public"
-echo $CODING_PASSWORD | docker login --username=$CODING_USERNAME --password-stdin $base_url
+# echo $CODING_PASSWORD | docker login --username=$CODING_USERNAME --password-stdin $base_url
 
 registry=`cat registry.txt`
 
