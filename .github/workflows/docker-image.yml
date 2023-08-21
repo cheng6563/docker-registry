@@ -23,10 +23,10 @@ jobs:
   build_coding:
     runs-on: ubuntu-latest
     steps:
-    - name: login my registry
+    - name: login 
       uses: docker/login-action@v1
       with:
-        registry: cheng6563-docker.pkg.coding.net/container-registry/public
+        registry: cheng6563-docker.pkg.coding.net
         username: ${{ secrets.CODING_USERNAME }}
         password: ${{ secrets.CODING_USERNAME }}
     - uses: actions/checkout@v3
@@ -37,7 +37,7 @@ jobs:
       MY_REGISTRY_URL: ${{ secrets.MY_REGISTRY_URL }}
     runs-on: ubuntu-latest
     steps:
-    - name: login my registry
+    - name: login 
       uses: docker/login-action@v1
       with:
         registry: ${{ secrets.MY_REGISTRY_URL }}
