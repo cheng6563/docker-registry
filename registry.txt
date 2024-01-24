@@ -3,9 +3,12 @@ registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-5
 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
 quay.io/prometheus-operator/prometheus-config-reloader:v0.66.0
 quay.io/prometheus/alertmanager:v0.25.0
+quay.io/prometheus/alertmanager:v0.26.0
 quay.io/prometheus-operator/prometheus-operator:v0.66.0
+quay.io/prometheus-operator/prometheus-operator:v0.71.0
 quay.io/prometheus/node-exporter:v1.6.0
 quay.io/prometheus/prometheus:v2.45.0
+quay.io/prometheus/prometheus:v2.49.0
 quay.io/kiwigrid/k8s-sidecar:1.24.6
 docker.io/grafana/grafana:10.0.2
 ghcr.io/cheng6563/flask:latest
