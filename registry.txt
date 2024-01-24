@@ -16,3 +16,4 @@ docker.io/grafana/grafana:10.0.2
 ghcr.io/cheng6563/flask:latest
 timberio/vector:0.34.X-alpine
 ghcr.io/stakater/reloader:v1.0.62
+registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6
