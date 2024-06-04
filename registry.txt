@@ -10,11 +10,13 @@ quay.io/prometheus/alertmanager:v0.27.0
 quay.io/prometheus-operator/prometheus-operator:v0.66.0
 quay.io/prometheus-operator/prometheus-operator:v0.71.0
 quay.io/prometheus-operator/prometheus-operator:v0.73.2
+quay.io/prometheus-operator/prometheus-operator:v0.74.0
 quay.io/prometheus/node-exporter:v1.6.0
 quay.io/prometheus/prometheus:v2.45.0
 quay.io/prometheus/prometheus:v2.49.0
 quay.io/prometheus/prometheus:v2.49.1
 quay.io/prometheus/prometheus:v2.51.2
+quay.io/prometheus/prometheus:v2.52.0
 quay.io/kiwigrid/k8s-sidecar:1.24.6
 docker.io/grafana/grafana:10.0.2
 ghcr.io/cheng6563/flask:latest
