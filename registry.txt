@@ -4,6 +4,7 @@ registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
 quay.io/prometheus-operator/prometheus-config-reloader:v0.66.0
 quay.io/prometheus-operator/prometheus-config-reloader:v0.71.0
 quay.io/prometheus-operator/prometheus-config-reloader:v0.73.2
+quay.io/prometheus-operator/prometheus-config-reloader:v0.74.0
 quay.io/prometheus/alertmanager:v0.25.0
 quay.io/prometheus/alertmanager:v0.26.0
 quay.io/prometheus/alertmanager:v0.27.0
