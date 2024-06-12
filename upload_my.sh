@@ -17,11 +17,6 @@ do
     newname=$(echo "$src" | sed 's/[^/]*\///')
     dst="$base_url/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
-    docker  manifest inspect $dst > /dev/null 2>&1
-    if [ "$?" -ne "0" ]; then
-        echo "exist image, skip"
-        continue
-    fi
 
     docker pull $src
     docker tag $src $dst
