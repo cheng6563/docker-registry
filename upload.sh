@@ -20,6 +20,13 @@ do
     newname=$(echo "$src" | sed 's/[^/]*\///')
     dst="ghcr.io/$author/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
+
+    docker manifest inspect $dst > /dev/null 2>&1
+    if [ "$?" -ne "0" ]; then
+        echo "exist image, skip"
+        continue
+    fi
+
     docker pull $src
     docker tag $src $dst
     docker push $dst
