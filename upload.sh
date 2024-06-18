@@ -20,12 +20,20 @@ do
     newname=$(echo "$src" | sed 's/[^/]*\///')
     dst="ghcr.io/$author/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
-    
-    if [ "$?" -eq 0 ]; then
-        echo "exist image, skip"
+
+    src_digest=$(docker manifest inspect $src 2>/dev/null | jq -r '.config.digest')
+    if [ -z "$src_digest" ]; then
+        echo "Failed to get digest for source image $src"
         continue
     fi
 
+    dst_digest=$(docker manifest inspect $dst 2>/dev/null | jq -r '.config.digest')
+    
+    if [ "$src_digest" = "$dst_digest" ]; then
+        echo "exist image with same digest, skip"
+        continue
+    fi
+    
     docker pull $src
     docker tag $src $dst
     docker push $dst
