@@ -18,18 +18,29 @@ do
     dst="$base_url/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
 
-    src_digest=$(docker manifest inspect $src 2>/dev/null | jq -r '.config.digest')
-    if [ -z "$src_digest" ]; then
-        echo "Failed to get digest for source image $src"
+    src_manifest=$(docker manifest inspect $src 2>/dev/null)
+    if [ -z "$src_manifest" ]; then
+        echo "Failed to get manifest for source image $src"
         continue
     fi
 
-    dst_digest=$(docker manifest inspect $dst 2>/dev/null | jq -r '.config.digest')
+    dst_manifest=$(docker manifest inspect $dst 2>/dev/null)
     
-    if [ "$src_digest" = "$dst_digest" ]; then
-        echo "exist image with same digest, skip"
-        continue
+    if [ -z "$dst_manifest" ]; then
+        echo "Destination image $dst does not exist, proceeding to transfer."
+    else
+        src_config_digest=$(echo $src_manifest | jq -r '.config.digest')
+        dst_config_digest=$(echo $dst_manifest | jq -r '.config.digest')
+
+        src_layers_digest=$(echo $src_manifest | jq -r '.layers[].digest' | sort)
+        dst_layers_digest=$(echo $dst_manifest | jq -r '.layers[].digest' | sort)
+
+        if [ "$src_config_digest" = "$dst_config_digest" ] && [ "$src_layers_digest" = "$dst_layers_digest" ]; then
+            echo "exist image with same digest, skip"
+            continue
+        fi
     fi
+    
     docker pull $src
     docker tag $src $dst
     docker push $dst
