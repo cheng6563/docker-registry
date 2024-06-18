@@ -18,6 +18,13 @@ do
     dst="$base_url/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
 
+    docker manifest inspect $dst > /dev/null 2>&1
+    
+    if [ "$?" -eq 0 ]; then
+        echo "exist image, skip"
+        continue
+    fi
+
     docker pull $src
     docker tag $src $dst
     docker push $dst
