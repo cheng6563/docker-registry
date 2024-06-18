@@ -17,30 +17,26 @@ do
     newname=$(echo "$src" | sed 's/[^/]*\///')
     dst="$base_url/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
+    
+    # 插入新逻辑，判断是否需要直接转发
+    tag=$(echo "$src" | awk -F: '{print $2}')
+    if [ -z "$tag" ]; then
+        tag="latest"
+    fi
 
-    src_manifest=$(docker manifest inspect $src 2>/dev/null)
-    if [ -z "$src_manifest" ]; then
-        echo "Failed to get manifest for source image $src"
+    if echo "$tag" | grep -Eq '^(latest|[^.]+(\.[^.]+)?)$'; then
+        docker pull $src
+        docker tag $src $dst
+        docker push $dst
         continue
     fi
 
-    dst_manifest=$(docker manifest inspect $dst 2>/dev/null)
+    docker manifest inspect $dst > /dev/null 2>&1
     
-    if [ -z "$dst_manifest" ]; then
-        echo "Destination image $dst does not exist, proceeding to transfer."
-    else
-        src_config_digest=$(echo $src_manifest | jq -r '.config.digest')
-        dst_config_digest=$(echo $dst_manifest | jq -r '.config.digest')
-
-        src_layers_digest=$(echo $src_manifest | jq -r '.layers[].digest' | sort)
-        dst_layers_digest=$(echo $dst_manifest | jq -r '.layers[].digest' | sort)
-
-        if [ "$src_config_digest" = "$dst_config_digest" ] && [ "$src_layers_digest" = "$dst_layers_digest" ]; then
-            echo "exist image with same digest, skip"
-            continue
-        fi
+    if [ "$?" -eq 0 ]; then
+        echo "exist image, skip"
+        continue
     fi
-    
     docker pull $src
     docker tag $src $dst
     docker push $dst
