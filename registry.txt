@@ -48,6 +48,7 @@ docker.io/timberio/vector:0.33.X-alpine
 docker.io/timberio/vector:0.34.X-alpine
 docker.io/timonwong/prometheus-webhook-dingtalk:latest
 ghcr.io/cheng6563/flask:latest
+ghcr.io/cheng6563/cutils:latest
 ghcr.io/stakater/reloader:v1.0.62
 k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
 quay.io/kiwigrid/k8s-sidecar:1.24.6
