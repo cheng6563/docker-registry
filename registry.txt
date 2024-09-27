@@ -14,6 +14,10 @@ docker.io/library/nginx:latest
 docker.io/library/python:3-alpine
 docker.io/library/rabbitmq:3.11.10-management
 docker.io/library/rabbitmq:3.13.2-management
+docker.io/library/node:14-alpine
+docker.io/library/node:16-alpine
+docker.io/library/node:18-alpine
+docker.io/library/node:20-alpine
 docker.io/nacos/nacos-server
 docker.io/nacos/nacos-server:latest
 docker.io/nacos/nacos-server:v2.3.2
@@ -71,3 +75,4 @@ quay.io/prometheus/prometheus:v2.51.2
 quay.io/prometheus/prometheus:v2.52.0
 registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6
 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2
+
