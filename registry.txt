@@ -15,9 +15,13 @@ docker.io/library/python:3-alpine
 docker.io/library/rabbitmq:3.11.10-management
 docker.io/library/rabbitmq:3.13.2-management
 docker.io/library/node:14-alpine
+docker.io/library/node:14
 docker.io/library/node:16-alpine
+docker.io/library/node:16
 docker.io/library/node:18-alpine
+docker.io/library/node:18
 docker.io/library/node:20-alpine
+docker.io/library/node:20
 docker.io/nacos/nacos-server
 docker.io/nacos/nacos-server:latest
 docker.io/nacos/nacos-server:v2.3.2
