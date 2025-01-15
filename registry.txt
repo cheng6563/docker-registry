@@ -3,6 +3,7 @@ docker.io/containous/whoami:latest
 docker.io/danysk/zstd:latest
 docker.io/grafana/grafana:10.0.2
 docker.io/grafana/grafana:10.0.3
+docker.io/grafana/grafana:11.4.0
 docker.io/jumpserver/jms_all:v3.10.10
 docker.io/library/alpine
 docker.io/library/alpine:latest
@@ -60,14 +61,17 @@ ghcr.io/cheng6563/cutils:latest
 ghcr.io/stakater/reloader:v1.0.62
 k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
 quay.io/kiwigrid/k8s-sidecar:1.24.6
+quay.io/kiwigrid/k8s-sidecar:1.28.0
 quay.io/prometheus-operator/prometheus-config-reloader:v0.66.0
 quay.io/prometheus-operator/prometheus-config-reloader:v0.71.0
 quay.io/prometheus-operator/prometheus-config-reloader:v0.73.2
 quay.io/prometheus-operator/prometheus-config-reloader:v0.74.0
+quay.io/prometheus-operator/prometheus-config-reloader:v0.79.2
 quay.io/prometheus-operator/prometheus-operator:v0.66.0
 quay.io/prometheus-operator/prometheus-operator:v0.71.0
 quay.io/prometheus-operator/prometheus-operator:v0.73.2
 quay.io/prometheus-operator/prometheus-operator:v0.74.0
+quay.io/prometheus-operator/prometheus-operator:v0.79.2
 quay.io/prometheus/alertmanager:v0.25.0
 quay.io/prometheus/alertmanager:v0.26.0
 quay.io/prometheus/alertmanager:v0.27.0
