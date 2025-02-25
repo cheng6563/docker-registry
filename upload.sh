@@ -12,6 +12,26 @@ if [ -z "$registry" ]; then
     exit 0
 fi
 
+is_subset() {
+    local SUB="$1"
+    local ALL="$2"
+    
+    local old_ifs="$IFS"
+    IFS=$'\n'
+    
+    for line in $SUB; do
+        [ -z "$line" ] && continue
+        
+        if ! echo "$ALL" | grep -Fq "$line"; then
+            IFS="$old_ifs"
+            return 1
+        fi
+    done
+    
+    IFS="$old_ifs"
+    return 0
+}
+
 echo "$registry" | while IFS= read -r src
 do
     if [ -z "$src" ]; then
@@ -21,25 +41,14 @@ do
     dst="ghcr.io/$author/$newname"
     echo "pull registry '$src' and push to registry '$dst'"
 
-    # 插入新逻辑，判断是否需要直接转发
-    tag=$(echo "$src" | awk -F: '{print $2}')
-    if [ -z "$tag" ]; then
-        tag="latest"
-    fi
+    dst_degests=`docker manifest inspect $dst -v | grep 'digest' | sed 's/[^a-zA-Z0-9_]//g'`
+    src_degests=`docker manifest inspect $src -v | grep 'digest' | sed 's/[^a-zA-Z0-9_]//g'`
 
-    if echo "$tag" | grep -Eq '^(latest|[^.]+(\.[^.]+)?)$'; then
-        docker pull $src
-        docker tag $src $dst
-        docker push $dst
+    if [ -n "$dst_degests" ] && is_subset "$dst_degests" "$src_degests"; then
+        echo "skip $src"
         continue
     fi
 
-    docker manifest inspect $dst > /dev/null 2>&1
-    
-    if [ "$?" -eq 0 ]; then
-        echo "exist image, skip"
-        continue
-    fi
     docker pull $src
     docker tag $src $dst
     docker push $dst
