@@ -15,6 +15,7 @@ docker.io/library/nginx:latest
 docker.io/library/python:3-alpine
 docker.io/library/rabbitmq:3.11.10-management
 docker.io/library/rabbitmq:3.13.2-management
+docker.io/library/rabbitmq:3-management
 docker.io/library/tomcat:7-jdk8-adoptopenjdk-openj9
 docker.io/library/node:12-alpine
 docker.io/library/node:12
