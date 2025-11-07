@@ -65,10 +65,12 @@ docker.io/library/ibm-semeru-runtimes:open-8-jdk
 docker.io/library/ibm-semeru-runtimes:open-11-jdk
 docker.io/library/ibm-semeru-runtimes:open-17-jdk
 docker.io/library/ibm-semeru-runtimes:open-21-jdk
+docker.io/library/ibm-semeru-runtimes:open-25-jdk
 docker.io/library/eclipse-temurin:8-jdk
 docker.io/library/eclipse-temurin:11-jdk
 docker.io/library/eclipse-temurin:17-jdk
 docker.io/library/eclipse-temurin:21-jdk
+docker.io/library/eclipse-temurin:25-jdk
 ghcr.io/cheng6563/flask:latest
 ghcr.io/cheng6563/cutils:latest
 ghcr.io/stakater/reloader:v1.0.62
