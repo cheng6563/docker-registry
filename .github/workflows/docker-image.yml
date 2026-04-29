@@ -1,4 +1,3 @@
-
 name: Docker Image CI
 
 on:
@@ -10,29 +9,35 @@ on:
     - cron: '0 2 * * *'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: login to GitHub Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: actions/checkout@v3
-    - name: build and push 
-      run: ./upload.sh ${{ github.actor }}
   build_my:
     env:
-      MY_REGISTRY_URL: ${{ secrets.MY_REGISTRY_URL }}
+      DST_REGISTRY_URL: ${{ secrets.DST_REGISTRY_URL }}
+      DST_REGISTRY_URL_HTTP: ${{ secrets.DST_REGISTRY_URL_HTTP }}
     runs-on: ubuntu-latest
     steps:
-    - name: login 
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ secrets.MY_REGISTRY_URL }}
-        username: ${{ secrets.MY_REGISTRY_USERNAME }}
-        password: ${{ secrets.MY_REGISTRY_PASSWORD }}
     - uses: actions/checkout@v3
-    - name: build and push 
-      run: ./upload_my.sh 
+    - name: setup insecure registry
+      if: ${{ env.DST_REGISTRY_URL_HTTP != '' }}
+      run: |
+        host=$(echo "$DST_REGISTRY_URL_HTTP" | sed 's|.*://||; s|/.*||')
+        sudo mkdir -p /etc/docker
+        if [ -f /etc/docker/daemon.json ]; then
+          python3 -c "
+        import json
+        with open('/etc/docker/daemon.json') as f:
+            cfg = json.load(f)
+        insecure = cfg.setdefault('insecure-registries', [])
+        if '$host' not in insecure:
+            insecure.append('$host')
+        with open('/etc/docker/daemon.json', 'w') as f:
+            json.dump(cfg, f, indent=2)
+        "
+        else
+          echo "{\"insecure-registries\":[\"$host\"]}" | sudo tee /etc/docker/daemon.json
+        fi
+        sudo systemctl restart docker
+    - name: build and push
+      env:
+        DST_REGISTRY_USERNAME: ${{ secrets.DST_REGISTRY_USERNAME }}
+        DST_REGISTRY_PASSWORD: ${{ secrets.DST_REGISTRY_PASSWORD }}
+      run: ./upload_my.sh
