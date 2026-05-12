@@ -59,8 +59,26 @@ if [ -z "$registry" ]; then
     exit 0
 fi
 
-# check if tag exists on destination registry
-dst_tag_exists() {
+# destination registry auth args for curl
+dst_curl_auth_args() {
+    if [ -n "$DST_REGISTRY_USERNAME" ] && [ -n "$DST_REGISTRY_PASSWORD" ]; then
+        printf '%s\n' "--user ${DST_REGISTRY_USERNAME}:${DST_REGISTRY_PASSWORD}"
+    fi
+}
+
+dst_registry_proto() {
+    _host="$1"
+    _auth=$(dst_curl_auth_args)
+
+    # 200/401 both prove the HTTP registry endpoint is reachable; other cases fall back to HTTPS.
+    _code=$(curl -sI $_auth -o /dev/null -w "%{http_code}" "http://${_host}/v2/" 2>/dev/null || true)
+    case "$_code" in
+        200|401) printf '%s\n' "http" ;;
+        *) printf '%s\n' "https" ;;
+    esac
+}
+
+split_dst_ref() {
     _dst="$1"
     _host="${_dst%%/*}"
     _repo_tag="${_dst#*/}"
@@ -71,20 +89,130 @@ dst_tag_exists() {
         _repo="$_repo_tag"
         _tag="latest"
     fi
+}
 
-    _auth=""
-    if [ -n "$DST_REGISTRY_USERNAME" ] && [ -n "$DST_REGISTRY_PASSWORD" ]; then
-        _auth="--user ${DST_REGISTRY_USERNAME}:${DST_REGISTRY_PASSWORD}"
-    fi
+is_floating_tag() {
+    _tag="$1"
+    [ "$_tag" = "latest" ] || echo "$_tag" | grep -qiE '^(nightly|dev|master|main)$'
+}
 
-    # detect protocol
-    _proto="http"
-    curl -sI $_auth -o /dev/null -w "%{http_code}" "http://${_host}/v2/" 2>/dev/null | grep -q 200 || _proto="https"
+manifest_accept='application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json'
 
+# check if tag exists on destination registry
+dst_tag_exists() {
+    split_dst_ref "$1"
+    _auth=$(dst_curl_auth_args)
+    _proto=$(dst_registry_proto "$_host")
     _code=$(curl -s -o /dev/null -w "%{http_code}" $_auth \
-        -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+        -H "Accept: ${manifest_accept}" \
         "${_proto}://${_host}/v2/${_repo}/manifests/${_tag}" 2>/dev/null)
     [ "$_code" = "200" ]
+}
+
+json_config_digest() {
+    tr -d '\n\r' | sed -n 's/.*"config"[[:space:]]*:[[:space:]]*{[^}]*"digest"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+}
+
+json_first_manifest_digest() {
+    tr -d '\n\r' |
+        sed 's/"digest"/\
+"digest"/g' |
+        sed -n 's/^"digest"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' |
+        sed -n '1p'
+}
+
+json_created_value() {
+    tr -d '\n\r' | sed -n 's/.*"created"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+}
+
+created_to_epoch() {
+    _created="$1"
+    _epoch=$(date -u -d "$_created" +%s 2>/dev/null || true)
+
+    if [ -z "$_epoch" ] && command -v python >/dev/null 2>&1; then
+        _epoch=$(python - "$_created" <<'PY' 2>/dev/null || true
+import datetime
+import re
+import sys
+
+s = sys.argv[1]
+if s.endswith("Z"):
+    s = s[:-1] + "+00:00"
+
+match = re.match(r"^(.*T\d\d:\d\d:\d\d)\.(\d+)(.*)$", s)
+if match:
+    # Python datetime supports microseconds; Docker/OCI timestamps may use nanoseconds.
+    s = match.group(1) + "." + match.group(2)[:6].ljust(6, "0") + match.group(3)
+
+dt = datetime.datetime.fromisoformat(s)
+if dt.tzinfo is None:
+    dt = dt.replace(tzinfo=datetime.timezone.utc)
+print(int(dt.timestamp()))
+PY
+)
+    fi
+
+    case "$_epoch" in
+        ''|*[!0-9]*) return 1 ;;
+    esac
+    printf '%s\n' "$_epoch"
+}
+
+dst_image_created_epoch() {
+    split_dst_ref "$1"
+    _auth=$(dst_curl_auth_args)
+    _proto=$(dst_registry_proto "$_host")
+
+    _manifest=$(curl -fsSL $_auth \
+        -H "Accept: ${manifest_accept}" \
+        "${_proto}://${_host}/v2/${_repo}/manifests/${_tag}" 2>/dev/null) || return 1
+
+    _config_digest=$(printf '%s' "$_manifest" | json_config_digest)
+    if [ -z "$_config_digest" ]; then
+        _child_digest=$(printf '%s' "$_manifest" | json_first_manifest_digest)
+        [ -n "$_child_digest" ] || return 1
+        _manifest=$(curl -fsSL $_auth \
+            -H "Accept: ${manifest_accept}" \
+            "${_proto}://${_host}/v2/${_repo}/manifests/${_child_digest}" 2>/dev/null) || return 1
+        _config_digest=$(printf '%s' "$_manifest" | json_config_digest)
+    fi
+
+    [ -n "$_config_digest" ] || return 1
+    _config=$(curl -fsSL $_auth \
+        "${_proto}://${_host}/v2/${_repo}/blobs/${_config_digest}" 2>/dev/null) || return 1
+    _created=$(printf '%s' "$_config" | json_created_value)
+    [ -n "$_created" ] || return 1
+    created_to_epoch "$_created"
+}
+
+dst_floating_tag_is_recent() {
+    _dst="$1"
+    _max_days="$2"
+
+    _created_epoch=$(dst_image_created_epoch "$_dst") || {
+        echo "  refresh $_dst — target image created time unavailable"
+        return 1
+    }
+    _now_epoch=$(date -u +%s 2>/dev/null || true)
+    case "$_now_epoch" in
+        ''|*[!0-9]*)
+            echo "  refresh $_dst — current time unavailable"
+            return 1
+            ;;
+    esac
+
+    _age=$((_now_epoch - _created_epoch))
+    [ "$_age" -lt 0 ] && _age=0
+    _age_days=$((_age / 86400))
+    _max_age=$((_max_days * 86400))
+
+    if [ "$_age" -lt "$_max_age" ]; then
+        echo "  skip $_dst — floating tag target image is ${_age_days}d old (< ${_max_days}d)"
+        return 0
+    fi
+
+    echo "  refresh $_dst — floating tag target image is ${_age_days}d old (>= ${_max_days}d)"
+    return 1
 }
 
 echo "$registry" | while IFS= read -r src
@@ -93,11 +221,15 @@ do
         continue
     fi
 
-    # skip :latest or :nightly etc. — pull first then push (dedup handled by docker push)
+    # Floating tags are refreshed only when the destination image is stale or unreadable.
     _tag="${src##*:}"
-    if [ "$_tag" = "latest" ] || echo "$_tag" | grep -qiE '^(nightly|dev|master|main)$'; then
+    if is_floating_tag "$_tag"; then
         newname=$(echo "$src" | sed 's/[^/]*\///')
         dst="$base_url/$newname"
+        if dst_floating_tag_is_recent "$dst" 15; then
+            continue
+        fi
+
         echo "pull registry '$src' and push to registry '$dst'"
 
         src_registry_login "$src"
