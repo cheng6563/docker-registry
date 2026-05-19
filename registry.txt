@@ -1,6 +1,7 @@
 docker.io/bitnami/kubectl:latest
 docker.io/containous/whoami:latest
 docker.io/danysk/zstd:latest
+docker.io/flyway/flyway:latest
 docker.io/grafana/grafana:10.0.2
 docker.io/grafana/grafana:10.0.3
 docker.io/grafana/grafana:11.4.0
