@@ -27,6 +27,7 @@ docker.io/library/nginx:latest
 docker.io/library/nginx:alpine
 docker.io/library/mysql:5.7
 docker.io/library/mysql:8.0
+docker.io/library/mysql:8.4
 docker.io/library/node:12
 docker.io/library/node:12-alpine
 docker.io/library/node:14
