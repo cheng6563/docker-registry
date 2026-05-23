@@ -38,6 +38,8 @@ docker.io/library/node:18
 docker.io/library/node:18-alpine
 docker.io/library/node:20
 docker.io/library/node:20-alpine
+docker.io/library/node:22
+docker.io/library/node:22-alpine
 docker.io/library/python:3-alpine
 docker.io/library/rabbitmq:3-management
 docker.io/library/rabbitmq:3.11.10-management
