@@ -1,4 +1,5 @@
 docker.io/bitnami/kubectl:latest
+docker.io/calciumion/new-api:latest
 docker.io/containous/whoami:latest
 docker.io/danysk/zstd:latest
 docker.io/flyway/flyway:latest
@@ -12,7 +13,7 @@ docker.io/library/busybox
 docker.io/library/busybox:latest
 docker.io/library/caddy:2
 docker.io/library/caddy:2.7-alpine
-docker.io/calciumion/new-api:latest
+docker.io/library/docker:27-cli
 docker.io/library/eclipse-temurin:11-jdk
 docker.io/library/eclipse-temurin:17-jdk
 docker.io/library/eclipse-temurin:21-jdk
